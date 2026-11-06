@@ -1,16 +1,22 @@
-# ECG rhythm screening
+I merged this into my existing [lab-assay-lims project](https://github.com/jackaI1/lab-assay-lims/tree/main/projects/ecg-samd-lifecycle). The current code is in `projects/ecg-samd-lifecycle/` there. I kept the code here so older links still work.
 
-I built a heart-rhythm screening tool because I wanted a way to check whether an ECG algorithm still did what I intended after I changed its code. It finds heartbeats in public recordings, measures the time between them, and marks 30-second sections with uneven beat spacing for inspection. It also checks each result against the recording's reference annotations, which are labels supplied with the data.
+The move keeps the original layout, including `tests/test_traceability.py`, `tests/test_core.py`, `tests/test_evaluate.py`, `tests/test_data.py`. I replaced the README with the report below and left out Git history, installed dependencies, caches and generated build output from the hub copy.
 
-This is a learning exercise, not a cleared device. Do not use it for diagnosis, triage, treatment or reassurance about a person's health. It collects no new patient data and uses no private or identifiable patient records. The inputs are public, de-identified historical ECG recordings from real people, not synthetic signals.
+The 5 test source files moved with the code. No project-specific GitHub Actions workflow was retained; the report records the omitted checks, and the test sources can be run locally from the linked folder.
+
+Omitted workflows: `ecg-samd-lifecycle-verify.yml`: The relocated workflow did not complete successfully within the migration batch. Local test sources remain available.
+
+---
+
+# ecg-samd-lifecycle
+
+I built a heart-rhythm screening tool to learn how the underlying idea works. This is a learning project.
 
 ## Try it
 
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/), a Python environment manager, then run:
 
 ```sh
-git clone https://github.com/jackaI1/ecg-samd-lifecycle.git
-cd ecg-samd-lifecycle
 uv sync --frozen --python 3.12
 uv run ecg-lifecycle evaluate
 ```
@@ -18,20 +24,6 @@ uv run ecg-lifecycle evaluate
 The first run downloads about 6 MB from PhysioNet. It reads three complete recordings and writes `build/benchmark.json`. Each 30-second window includes its beat-spacing measurements and a `regular`, `irregular` or `insufficient_data` result. A regular result only means the timing thresholds were not crossed; it says nothing about whether a heart is healthy.
 
 To inspect one recording, run `uv run ecg-lifecycle evaluate --records 201 --output build/201.json`. The command accepts only the three public demonstration records. It has no patient upload feature.
-
-## What I check
-
-A good-looking result is not enough to tell me whether a change is safe to keep. I wrote down the expected behaviour, the ways the output could mislead someone, and the tests for each control. A script builds the table connecting those requirements and controls to tests. The check fails if any link is missing, the named test does not exist, or the test did not pass.
-
-I used an IEC 62304 style software lifecycle and ISO 14971 style risk file to organize that work. These standards describe software development and medical-device risk management. This small project does not claim compliance, certification or clinical validation. My [design-control record](docs/lifecycle-process.md) explains the scope and what a real release would still require.
-
-The lifecycle files are:
-
-- [Requirements](docs/requirements.md): what the tool must do and how I accept a change.
-- [Architecture and SOUP list](docs/architecture-and-soup.md): how the parts fit together and which outside software I rely on. SOUP means software of unknown provenance, used here as a dependency-review concept.
-- [Risk file](docs/risk-file.md): hazards, controls, remaining problems and the decision to prohibit clinical use.
-- [Generated traceability matrix](docs/traceability.md): the requirements and controls connected to executed tests.
-- [Verification report](docs/verification-report.md): the saved local baseline. Every CI run produces a fresh report and downloadable evidence.
 
 ## How the detector works
 
@@ -56,18 +48,12 @@ uv run --frozen python -m scripts.verify --update-docs
 
 `build/` contains the report, test results, matrix, environment details, input hashes and every window's features. Raw recordings stay in the ignored `.cache/mitdb/` directory. Set `ECG_DATA_DIR` to reuse a verified cache elsewhere. Every input file is checked against a committed SHA-256 digest before it is read. A corrupt cache stops the command; remove the named file to download it again.
 
-## Baseline results and CI
+## Tests and limits
 
-Heartbeat matching allows a 150 ms difference from an annotated beat, with each beat used at most once. Sensitivity means the share of reference beats found. Positive predictive value (PPV) means the share of detected beats that matched a reference beat.
+There are 5 test source files in this copy. That source count does not establish an execution result. This is a source snapshot, and running it on a new machine may need environment-specific setup.
 
-| Full record | Reference beats | Missed beats | Extra detections | Sensitivity | PPV |
-| --- | --- | --- | --- | --- | --- |
-| 100 | 2,273 | 0 | 0 | 100.00% | 100.00% |
-| 201 | 1,963 | 76 | 0 | 96.13% | 100.00% |
-| 203 | 2,980 | 65 | 18 | 97.82% | 99.39% |
 
-The irregular-window comparison is much less reliable as a disease proxy: record 201 has 35 false-positive AFIB windows and only 32.69% PPV. Record 203 has four AFIB-positive abstentions; counting those as misses gives 91.67% sensitivity. Record 100 has no AFIB-positive windows, so its AFIB sensitivity is undefined. I have not validated the tool across the full database or a new population.
 
-[GitHub Actions](https://github.com/jackaI1/ecg-samd-lifecycle/actions/workflows/verify.yml) runs the full suite on pull requests and on `main`, generates the verification report, checks the matrix is current, and uploads an evidence artifact. The baseline has 25 passing tests, 11 requirements and 10 risk controls. Passing CI permits an educational code release only.
+The relocated workflow did not complete successfully within the migration batch. Local test sources remain available.
 
-Data citation: Moody, G., and Mark, R. (2005), MIT-BIH Arrhythmia Database v1.0.0, [doi:10.13026/C2F305](https://doi.org/10.13026/C2F305). Original database description: Moody and Mark (2001), *The impact of the MIT-BIH Arrhythmia Database*. Dataset use is under the [Open Data Commons Attribution License v1.0](https://physionet.org/content/mitdb/view-license/1.0.0/); the code has a separate [MIT license](LICENSE).
+No project-specific GitHub Actions workflow was retained. The local test sources remain in this folder.
