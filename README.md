@@ -2,7 +2,7 @@ I merged this into my existing [lab-assay-lims project](https://github.com/jacka
 
 The move keeps the original layout, including `tests/test_traceability.py`, `tests/test_core.py`, `tests/test_evaluate.py`, `tests/test_data.py`. I replaced the README with the report below and left out Git history, installed dependencies, caches and generated build output from the hub copy.
 
-The 5 test source files moved with the code. No project-specific GitHub Actions workflow was retained; the report records the omitted checks, and the test sources can be run locally from the linked folder.
+The 5 files of test code and supporting test helpers moved with the code. No project-specific GitHub Actions workflow was retained; the report records the omitted checks, and the test sources can be run locally from the linked folder.
 
 Omitted workflows: `ecg-samd-lifecycle-verify.yml`: The relocated workflow did not complete successfully within the migration batch. Local test sources remain available.
 
